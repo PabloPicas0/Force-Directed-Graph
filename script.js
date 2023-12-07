@@ -4,15 +4,16 @@ const width = 1024;
 const height = 768;
 const colors = d3.quantize(d3.interpolateHslLong("purple", "orange"), 168);
 
+// Good reference to recreate directed graph
+// https://observablehq.com/@d3/force-directed-graph/2?intent=fork
 const darwGraph = async () => {
   const dataset = await d3.json(
     "https://raw.githubusercontent.com/DealPete/forceDirected/master/countries.json"
   );
 
-  console.log(dataset);
-
   const { nodes, links } = dataset;
 
+  // Create copy of nodes and links for inpure simulation
   const newNodes = nodes.map((node) => {
     return { ...node };
   });
@@ -40,6 +41,8 @@ const darwGraph = async () => {
     .drag()
     .on("start", (e) => {
       if (!e.active) simulation.alphaTarget(0.3).restart();
+      // Specify two additional properties to fix a node in a given position
+      // See: https://d3js.org/d3-force/simulation#simulation_restart
       e.subject.fx = e.subject.x;
       e.subject.fy = e.subject.y;
     })
@@ -52,6 +55,15 @@ const darwGraph = async () => {
       e.subject.fx = null;
       e.subject.fy = null;
     });
+
+  const link = svg
+    .append("g")
+    .attr("stroke", "#999")
+    .attr("stroke-opacity", 0.6)
+    .selectAll()
+    .data(newLinks)
+    .join("line")
+    .attr("stroke-width", 0.5);
 
   const node = svg
     .append("g")
@@ -66,15 +78,6 @@ const darwGraph = async () => {
     .on("mouseover", (e) => console.log(e))
     .call(drag);
 
-  const link = svg
-    .append("g")
-    .attr("stroke", "#999")
-    .attr("stroke-opacity", 0.6)
-    .selectAll()
-    .data(newLinks)
-    .join("line")
-    .attr("stroke-width", 0.5);
-
   function tick() {
     link
       .attr("x1", (links) => links.source.x)
@@ -83,10 +86,7 @@ const darwGraph = async () => {
       .attr("y2", (links) => links.target.y);
 
     node.attr("cx", (nodes) => nodes.x).attr("cy", (nodes) => nodes.y);
-    console.log("tick occured");
   }
-
-  console.log(newLinks, newNodes);
 };
 
 darwGraph();
