@@ -30,33 +30,41 @@ const darwGraph = async () => {
 
   const simulation = d3
     .forceSimulation(newNodes)
-    .force("charge", d3.forceManyBody())
     .force("link", d3.forceLink(newLinks))
-    .force("center", d3.forceCenter(width / 2, height / 2));
+    .force("charge", d3.forceManyBody().strength(-5))
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    .on("tick", tick);
 
   const node = svg
     .append("g")
     .attr("stroke", "#fff")
     .attr("stroke-width", 1.5)
-    .attr("transform", `translate(${width / 2}, ${height / 2})`)
-    .selectAll("circle")
+    .selectAll()
     .data(newNodes)
-    .enter()
-    .append("circle")
+    .join("circle")
     .attr("r", 5)
     .attr("fill", (node, index) => colors[index])
-    .attr("cx", (node) => node.x)
-    .attr("cy", (node) => node.y);
+    .attr("data-country", (node) => node.country)
 
   const link = svg
     .append("g")
     .attr("stroke", "#999")
     .attr("stroke-opacity", 0.6)
-    .selectAll("line")
+    .selectAll()
     .data(newLinks)
-    .enter()
-    .append("line")
+    .join("line")
     .attr("stroke-width", 0.5);
+
+  function tick() {
+    link
+      .attr("x1", (links) => links.source.x)
+      .attr("y1", (links) => links.source.y)
+      .attr("x2", (links) => links.target.x)
+      .attr("y2", (links) => links.target.y);
+
+    node.attr("cx", (nodes) => nodes.x).attr("cy", (nodes) => nodes.y);
+    console.log("tick occured");
+  }
 
   console.log(newLinks, newNodes);
 };
