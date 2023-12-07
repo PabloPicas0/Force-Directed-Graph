@@ -31,9 +31,27 @@ const darwGraph = async () => {
   const simulation = d3
     .forceSimulation(newNodes)
     .force("link", d3.forceLink(newLinks))
-    .force("charge", d3.forceManyBody().strength(-5))
-    .force("center", d3.forceCenter(width / 2, height / 2))
+    .force("charge", d3.forceManyBody())
+    .force("x", d3.forceX(width / 2))
+    .force("y", d3.forceY(height / 2))
     .on("tick", tick);
+
+  const drag = d3
+    .drag()
+    .on("start", (e) => {
+      if (!e.active) simulation.alphaTarget(0.3).restart();
+      e.subject.fx = e.subject.x;
+      e.subject.fy = e.subject.y;
+    })
+    .on("drag", (e) => {
+      e.subject.fx = e.x;
+      e.subject.fy = e.y;
+    })
+    .on("end", (e) => {
+      if (!e.active) simulation.alphaTarget(0);
+      e.subject.fx = null;
+      e.subject.fy = null;
+    });
 
   const node = svg
     .append("g")
@@ -45,6 +63,8 @@ const darwGraph = async () => {
     .attr("r", 5)
     .attr("fill", (node, index) => colors[index])
     .attr("data-country", (node) => node.country)
+    .on("mouseover", (e) => console.log(e))
+    .call(drag);
 
   const link = svg
     .append("g")
