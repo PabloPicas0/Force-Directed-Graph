@@ -2,6 +2,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 const width = 1024;
 const height = 768;
+const flagOffset = 15
 const colors = d3.quantize(d3.interpolateHslLong("purple", "orange"), 168);
 
 // Good reference to recreate directed graph
@@ -65,16 +66,14 @@ const darwGraph = async () => {
     .join("line")
     .attr("stroke-width", 0.5);
 
-  const node = svg
-    .append("g")
-    .attr("stroke", "#fff")
-    .attr("stroke-width", 1.5)
+  const node = d3
+    .select(".flags")
     .selectAll()
     .data(newNodes)
-    .join("circle")
-    .attr("r", 5)
-    .attr("fill", (node, index) => colors[index])
+    .join("span")
+    .attr("class", (node) => `flag flag-${node.code}`)
     .attr("data-country", (node) => node.country)
+    .style("transform", "scale(0.5)")
     .on("mouseover", (e) => console.log(e))
     .call(drag);
 
@@ -85,7 +84,10 @@ const darwGraph = async () => {
       .attr("x2", (links) => links.target.x)
       .attr("y2", (links) => links.target.y);
 
-    node.attr("cx", (nodes) => nodes.x).attr("cy", (nodes) => nodes.y);
+
+    node
+      .style("left", (node) => `${node.x - flagOffset}px`)
+      .style("top", (node) => `${node.y - flagOffset}px`)
   }
 };
 
