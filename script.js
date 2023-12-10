@@ -2,7 +2,8 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 const width = 1024;
 const height = 768;
-const flagOffset = 15
+const flagOffset = 15;
+let flagCodes = [];
 
 // Good reference to recreate directed graph
 // https://observablehq.com/@d3/force-directed-graph/2?intent=fork
@@ -73,7 +74,27 @@ const darwGraph = async () => {
     .attr("class", (node) => `flag flag-${node.code}`)
     .attr("data-country", (node) => node.country)
     .style("transform", "scale(0.5)")
-    .on("mouseover", (e) => console.log(e))
+    .on("mouseover", (e) => {
+      const [data] = d3.select(e.target).data();
+      flagCodes = newLinks
+        .filter((link) => link.target.code === data.code || link.source.code === data.code)
+        .map((link) => {
+          if (link.target.code === data.code) return link.source.code;
+
+          return link.target.code;
+        });
+
+      flagCodes.unshift(data.code);
+
+      for (const flagCode of flagCodes) {
+        d3.select(`.flag-${flagCode}`).style("transform", "scale(0.8)");
+      }
+    })
+    .on("mouseout", () => {
+      for (const flagCode of flagCodes) {
+        d3.select(`.flag-${flagCode}`).style("transform", "scale(0.5)");
+      }
+    })
     .call(drag);
 
   function tick() {
@@ -83,10 +104,9 @@ const darwGraph = async () => {
       .attr("x2", (links) => links.target.x)
       .attr("y2", (links) => links.target.y);
 
-
     node
       .style("left", (node) => `${node.x - flagOffset}px`)
-      .style("top", (node) => `${node.y - flagOffset}px`)
+      .style("top", (node) => `${node.y - flagOffset}px`);
   }
 };
 
