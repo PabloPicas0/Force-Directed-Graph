@@ -3,7 +3,6 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 const width = 1024;
 const height = 768;
 const flagOffset = 15
-const colors = d3.quantize(d3.interpolateHslLong("purple", "orange"), 168);
 
 // Good reference to recreate directed graph
 // https://observablehq.com/@d3/force-directed-graph/2?intent=fork
