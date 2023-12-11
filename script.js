@@ -59,12 +59,11 @@ const darwGraph = async () => {
 
   const link = svg
     .append("g")
-    .attr("stroke", "#999")
-    .attr("stroke-opacity", 0.6)
     .selectAll()
     .data(newLinks)
     .join("line")
-    .attr("stroke-width", 0.5);
+    .attr("stroke", "#999")
+    .attr("stroke-width", 1);
 
   const node = d3
     .select(".flags")
@@ -72,16 +71,14 @@ const darwGraph = async () => {
     .data(newNodes)
     .join("span")
     .attr("class", (node) => `flag flag-${node.code}`)
-    .attr("data-country", (node) => node.country)
     .style("transform", "scale(0.5)")
     .on("mouseover", (e) => {
       const [data] = d3.select(e.target).data();
+
       flagCodes = newLinks
         .filter((link) => link.target.code === data.code || link.source.code === data.code)
         .map((link) => {
-          if (link.target.code === data.code) return link.source.code;
-
-          return link.target.code;
+          return link.target.code === data.code ? link.source.code : link.target.code;
         });
 
       flagCodes.unshift(data.code);
