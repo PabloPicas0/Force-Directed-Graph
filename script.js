@@ -78,18 +78,34 @@ const darwGraph = async () => {
       flagCodes = newLinks
         .filter((link) => link.target.code === data.code || link.source.code === data.code)
         .map((link) => {
-          return link.target.code === data.code ? link.source.code : link.target.code;
+          console.log(link);
+          return link.target.code === data.code
+            ? { code: link.source.code, x1: link.source.x, x2: link.target.x }
+            : { code: link.target.code, x1: link.source.x, x2: link.target.x };
         });
 
-      flagCodes.unshift(data.code);
+      flagCodes.unshift({ code: data.code, x1: null, x2: null });
 
       for (const flagCode of flagCodes) {
-        d3.select(`.flag-${flagCode}`).style("transform", "scale(0.8)");
+        d3.select(`.flag-${flagCode.code}`).style("transform", "scale(0.8)");
+
+        if (flagCode.x1 && flagCode.x2) {
+          d3.select(`line[x1="${flagCode.x1}"][x2="${flagCode.x2}"]`)
+            .style("stroke", "#fff")
+            .style("stroke-width", 2.5);
+        }
       }
     })
     .on("mouseout", () => {
       for (const flagCode of flagCodes) {
-        d3.select(`.flag-${flagCode}`).style("transform", "scale(0.5)");
+        d3.select(`.flag-${flagCode.code}`).style("transform", "scale(0.5)");
+
+        // TODO: add style remove 
+        if (flagCode.x1 && flagCode.x2) {
+          d3.select(`line[x1="${flagCode.x1}"][x2="${flagCode.x2}"]`)
+            .style("stroke", false)
+            .style("stroke-width", false);
+        }
       }
     })
     .call(drag);
