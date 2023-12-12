@@ -32,8 +32,9 @@ const darwGraph = async () => {
 
   const simulation = d3
     .forceSimulation(newNodes)
-    .force("link", d3.forceLink(newLinks).distance(50).iterations(5))
+    .force("link", d3.forceLink(newLinks).strength(1.4))
     .force("charge", d3.forceManyBody())
+    .force("collide", d3.forceCollide(20))
     .force("x", d3.forceX(width / 2).strength(0.05))
     .force("y", d3.forceY(height / 2).strength(0.05))
     .on("tick", tick);
@@ -41,7 +42,7 @@ const darwGraph = async () => {
   const drag = d3
     .drag()
     .on("start", (e) => {
-      if (!e.active) simulation.alphaTarget(0.5).restart();
+      if (!e.active) simulation.alphaTarget(0.05).restart();
       // Specify two additional properties to fix a node in a given position
       // See: https://d3js.org/d3-force/simulation#simulation_restart
       e.subject.fx = e.subject.x;
@@ -63,7 +64,7 @@ const darwGraph = async () => {
     .data(newLinks)
     .join("line")
     .attr("stroke", "#999")
-    .attr("stroke-width", 1)
+    .attr("stroke-width", 1);
 
   const node = d3
     .select(".flags")
@@ -78,7 +79,7 @@ const darwGraph = async () => {
       flagCodes = newLinks
         .filter((link) => link.target.code === data.code || link.source.code === data.code)
         .map((link) => {
-          console.log(link)
+          console.log(link);
           return link.target.code === data.code ? link.source.code : link.target.code;
         });
 
@@ -86,24 +87,11 @@ const darwGraph = async () => {
 
       for (const flagCode of flagCodes) {
         d3.select(`.flag-${flagCode}`).style("transform", "scale(0.8)");
-
-        if (flagCode.x1 && flagCode.x2) {
-          d3.select(`line[x1="${flagCode.x1}"][x2="${flagCode.x2}"]`)
-            .attr("stroke", "#fff")
-            .attr("stroke-width", 2.5);
-        }
       }
     })
     .on("mouseout", () => {
       for (const flagCode of flagCodes) {
         d3.select(`.flag-${flagCode}`).style("transform", "scale(0.5)");
-
-        // TODO: add style remove
-        if (flagCode.x1 && flagCode.x2) {
-          d3.select(`line[x1="${flagCode.x1}"][x2="${flagCode.x2}"]`)
-            .attr("stroke", "#999")
-            .attr("stroke-width", 1);
-        }
       }
     })
     .call(drag);
