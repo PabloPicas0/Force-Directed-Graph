@@ -32,16 +32,16 @@ const darwGraph = async () => {
 
   const simulation = d3
     .forceSimulation(newNodes)
-    .force("link", d3.forceLink(newLinks))
+    .force("link", d3.forceLink(newLinks).distance(50).iterations(5))
     .force("charge", d3.forceManyBody())
-    .force("x", d3.forceX(width / 2))
-    .force("y", d3.forceY(height / 2))
+    .force("x", d3.forceX(width / 2).strength(0.05))
+    .force("y", d3.forceY(height / 2).strength(0.05))
     .on("tick", tick);
 
   const drag = d3
     .drag()
     .on("start", (e) => {
-      if (!e.active) simulation.alphaTarget(0.3).restart();
+      if (!e.active) simulation.alphaTarget(0.5).restart();
       // Specify two additional properties to fix a node in a given position
       // See: https://d3js.org/d3-force/simulation#simulation_restart
       e.subject.fx = e.subject.x;
@@ -63,7 +63,7 @@ const darwGraph = async () => {
     .data(newLinks)
     .join("line")
     .attr("stroke", "#999")
-    .attr("stroke-width", 1);
+    .attr("stroke-width", 1)
 
   const node = d3
     .select(".flags")
@@ -78,33 +78,31 @@ const darwGraph = async () => {
       flagCodes = newLinks
         .filter((link) => link.target.code === data.code || link.source.code === data.code)
         .map((link) => {
-          console.log(link);
-          return link.target.code === data.code
-            ? { code: link.source.code, x1: link.source.x, x2: link.target.x }
-            : { code: link.target.code, x1: link.source.x, x2: link.target.x };
+          console.log(link)
+          return link.target.code === data.code ? link.source.code : link.target.code;
         });
 
-      flagCodes.unshift({ code: data.code, x1: null, x2: null });
+      flagCodes.unshift(data.code);
 
       for (const flagCode of flagCodes) {
-        d3.select(`.flag-${flagCode.code}`).style("transform", "scale(0.8)");
+        d3.select(`.flag-${flagCode}`).style("transform", "scale(0.8)");
 
         if (flagCode.x1 && flagCode.x2) {
           d3.select(`line[x1="${flagCode.x1}"][x2="${flagCode.x2}"]`)
-            .style("stroke", "#fff")
-            .style("stroke-width", 2.5);
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 2.5);
         }
       }
     })
     .on("mouseout", () => {
       for (const flagCode of flagCodes) {
-        d3.select(`.flag-${flagCode.code}`).style("transform", "scale(0.5)");
+        d3.select(`.flag-${flagCode}`).style("transform", "scale(0.5)");
 
-        // TODO: add style remove 
+        // TODO: add style remove
         if (flagCode.x1 && flagCode.x2) {
           d3.select(`line[x1="${flagCode.x1}"][x2="${flagCode.x2}"]`)
-            .style("stroke", false)
-            .style("stroke-width", false);
+            .attr("stroke", "#999")
+            .attr("stroke-width", 1);
         }
       }
     })
