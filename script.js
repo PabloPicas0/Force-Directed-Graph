@@ -3,7 +3,9 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 const width = 1024;
 const height = 768;
 const flagOffset = 15;
-let flagCodes = [];
+
+let activeBorders = [];
+let unactiveBorders = [];
 
 // Good reference to recreate directed graph
 // https://observablehq.com/@d3/force-directed-graph/2?intent=fork
@@ -76,23 +78,36 @@ const darwGraph = async () => {
     .on("mouseover", (e) => {
       const [data] = d3.select(e.target).data();
 
-      flagCodes = newLinks
+      activeBorders = newLinks
         .filter((link) => link.target.code === data.code || link.source.code === data.code)
         .map((link) => {
-          console.log(link);
           return link.target.code === data.code ? link.source.code : link.target.code;
         });
 
-      flagCodes.unshift(data.code);
+      activeBorders.unshift(data.code);
 
-      for (const flagCode of flagCodes) {
-        d3.select(`.flag-${flagCode}`).style("transform", "scale(0.8)");
+      unactiveBorders = newNodes
+        .map((node) => node.code)
+        .filter((nodeCode) => {
+          for (const flagCode of activeBorders) {
+            if (flagCode === nodeCode) return false;
+          }
+          return true;
+        });
+
+      // console.log(unactiveBorders);
+      // console.log(activeBorders);
+
+      for (const flagCode of activeBorders) {
+        d3.select(`.flag-${flagCode}`).style("transform", "scale(1)");
+      }
+
+      for (const flagCode of unactiveBorders) {
+        d3.select(`.flag-${flagCode}`).style("transform", "scale(0.4)");
       }
     })
     .on("mouseout", () => {
-      for (const flagCode of flagCodes) {
-        d3.select(`.flag-${flagCode}`).style("transform", "scale(0.5)");
-      }
+      d3.selectAll(`.flag`).style("transform", "scale(0.5)");
     })
     .call(drag);
 
