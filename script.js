@@ -78,6 +78,8 @@ const darwGraph = async () => {
     .on("mouseover", (e) => {
       const [data] = d3.select(e.target).data();
 
+      // Find all links between selected country
+      // Map through them and get country codes that shere borders
       activeBorders = newLinks
         .filter((link) => link.target.code === data.code || link.source.code === data.code)
         .map((link) => {
@@ -86,6 +88,8 @@ const darwGraph = async () => {
 
       activeBorders.unshift(data.code);
 
+      // When we have all countries that share borders with selected country
+      // Get all country codes and remove those that are highlighted
       unactiveBorders = newNodes
         .map((node) => node.code)
         .filter((nodeCode) => {
