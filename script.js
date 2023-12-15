@@ -6,6 +6,7 @@ const flagOffset = 15;
 
 let activeNodes = [];
 let unactiveNodes = [];
+let html = ``;
 
 // Good reference to recreate directed graph
 // https://observablehq.com/@d3/force-directed-graph/2?intent=fork
@@ -76,6 +77,7 @@ const darwGraph = async () => {
     .attr("class", (node) => `flag flag-${node.code}`)
     .style("transform", "scale(0.5)")
     .on("mouseover", (e, data) => {
+      const tooltip = d3.select(".tooltip");
       // Find all links between selected country
       // Map through them and get country codes that shere borders
       activeNodes = newLinks
@@ -106,6 +108,17 @@ const darwGraph = async () => {
         .attr("stroke", (d) => (d.source.code === data.code || d.target.code === data.code ? "#fff" : "#999"))
         .attr("stroke-width", (d) => (d.source.code === data.code || d.target.code === data.code ? 2.5 : 1));
 
+      for (const activeNode of activeNodes) {
+        html += `
+        <div>
+          <div class="tooltip-flag flag flag-${activeNode}"></div>
+          <span>${activeNode}</span>
+        </div>
+        `;
+      }
+
+      tooltip.style("top", `30px`).style("left", `$50px`).html(html);
+
       for (const flagCode of activeNodes) {
         d3.select(`.flag-${flagCode}`).style("transform", "scale(1)");
       }
@@ -117,6 +130,8 @@ const darwGraph = async () => {
     .on("mouseout", () => {
       d3.selectAll(".flag").style("transform", "scale(0.5)");
       d3.selectAll("line").attr("stroke", "#999").attr("stroke-width", 1);
+
+      html = ``;
     })
     .call(drag);
 

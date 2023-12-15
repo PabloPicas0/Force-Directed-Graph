@@ -2,6 +2,11 @@ body {
   background-color: #000;
 }
 
+.tooltip {
+  position: fixed;
+  background-color: bisque;
+}
+
 .flags {
   position: absolute;
 }
@@ -15,6 +20,15 @@ body {
   transition: transform 250ms ease-out;
   z-index: 0;
   background: url("https://raw.githubusercontent.com/moT01/FCC-Force-Graph/master/flags.png") no-repeat;
+}
+
+.tooltip {
+  padding: 10px;
+}
+
+.tooltip-flag {
+  position: relative;
+  transform: scale(1) !important;
 }
 
 .flag.flag-ca {
