@@ -4,8 +4,8 @@ const width = 1024;
 const height = 768;
 const flagOffset = 15;
 
-let activeBorders = [];
-let unactiveBorders = [];
+let activeNodes = [];
+let unactiveNodes = [];
 
 // Good reference to recreate directed graph
 // https://observablehq.com/@d3/force-directed-graph/2?intent=fork
@@ -75,25 +75,25 @@ const darwGraph = async () => {
     .join("span")
     .attr("class", (node) => `flag flag-${node.code}`)
     .style("transform", "scale(0.5)")
-    .on("mouseover", (e) => {
-      const [data] = d3.select(e.target).data();
-
+    .on("mouseover", (e, data) => {
       // Find all links between selected country
       // Map through them and get country codes that shere borders
-      activeBorders = newLinks
-        .filter((link) => link.target.code === data.code || link.source.code === data.code)
+      activeNodes = newLinks
+        .filter((link) => {
+          return link.target.code === data.code || link.source.code === data.code;
+        })
         .map((link) => {
           return link.target.code === data.code ? link.source.code : link.target.code;
         });
 
-      activeBorders.unshift(data.code);
+      activeNodes.unshift(data.code);
 
       // When we have all countries that share borders with selected country
       // Get all country codes and remove those that are highlighted
-      unactiveBorders = newNodes
+      unactiveNodes = newNodes
         .map((node) => node.code)
         .filter((nodeCode) => {
-          for (const flagCode of activeBorders) {
+          for (const flagCode of activeNodes) {
             if (flagCode === nodeCode) return false;
           }
           return true;
@@ -102,16 +102,21 @@ const darwGraph = async () => {
       // console.log(unactiveBorders);
       // console.log(activeBorders);
 
-      for (const flagCode of activeBorders) {
+      link
+        .attr("stroke", (d) => (d.source.code === data.code || d.target.code === data.code ? "#fff" : "#999"))
+        .attr("stroke-width", (d) => (d.source.code === data.code || d.target.code === data.code ? 2.5 : 1));
+
+      for (const flagCode of activeNodes) {
         d3.select(`.flag-${flagCode}`).style("transform", "scale(1)");
       }
 
-      for (const flagCode of unactiveBorders) {
+      for (const flagCode of unactiveNodes) {
         d3.select(`.flag-${flagCode}`).style("transform", "scale(0.4)");
       }
     })
     .on("mouseout", () => {
-      d3.selectAll(`.flag`).style("transform", "scale(0.5)");
+      d3.selectAll(".flag").style("transform", "scale(0.5)");
+      d3.selectAll("line").attr("stroke", "#999").attr("stroke-width", 1);
     })
     .call(drag);
 
