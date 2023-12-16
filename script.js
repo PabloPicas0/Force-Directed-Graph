@@ -85,10 +85,12 @@ const darwGraph = async () => {
           return link.target.code === data.code || link.source.code === data.code;
         })
         .map((link) => {
-          return link.target.code === data.code ? link.source.code : link.target.code;
+          return link.target.code === data.code
+            ? { code: link.source.code, country: link.source.country }
+            : { code: link.target.code, country: link.target.country };
         });
 
-      activeNodes.unshift(data.code);
+      activeNodes.unshift({ code: data.code, country: data.country });
 
       // When we have all countries that share borders with selected country
       // Get all country codes and remove those that are highlighted
@@ -96,7 +98,7 @@ const darwGraph = async () => {
         .map((node) => node.code)
         .filter((nodeCode) => {
           for (const flagCode of activeNodes) {
-            if (flagCode === nodeCode) return false;
+            if (flagCode.code === nodeCode) return false;
           }
           return true;
         });
@@ -110,9 +112,9 @@ const darwGraph = async () => {
 
       for (const activeNode of activeNodes) {
         html += `
-        <div>
-          <div class="tooltip-flag flag flag-${activeNode}"></div>
-          <span>${activeNode}</span>
+        <div class="tooltip-wrapper">
+          <div class="tooltip-flag flag flag-${activeNode.code}"></div>
+          <span>${activeNode.country}</span>
         </div>
         `;
       }
@@ -120,7 +122,7 @@ const darwGraph = async () => {
       tooltip.style("top", `30px`).style("left", `$50px`).html(html);
 
       for (const flagCode of activeNodes) {
-        d3.select(`.flag-${flagCode}`).style("transform", "scale(1)");
+        d3.select(`.flag-${flagCode.code}`).style("transform", "scale(1)");
       }
 
       for (const flagCode of unactiveNodes) {
