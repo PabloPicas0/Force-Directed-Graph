@@ -37,7 +37,7 @@ const darwGraph = async () => {
     .forceSimulation(newNodes)
     .force("link", d3.forceLink(newLinks).strength(1.4))
     .force("charge", d3.forceManyBody())
-    .force("collide", d3.forceCollide(20))
+    .force("collide", d3.forceCollide(23))
     .force("x", d3.forceX(width / 2).strength(0.05))
     .force("y", d3.forceY(height / 2).strength(0.05))
     .on("tick", tick);
