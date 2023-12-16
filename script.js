@@ -120,7 +120,7 @@ const darwGraph = async () => {
         `;
       }
 
-      tooltip.style("top", `30px`).style("left", `$50px`).style("opacity", 1).html(html);
+      tooltip.style("top", `20px`).style("left", `$50px`).style("opacity", 1).html(html);
 
       for (const flagCode of activeNodes) {
         d3.select(`.flag-${flagCode.code}`).style("transform", "scale(1)");
