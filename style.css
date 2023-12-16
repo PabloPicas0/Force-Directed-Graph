@@ -6,6 +6,7 @@ body {
   position: fixed;
   background-color: bisque;
   padding: 10px;
+  border-radius: 10px;
 }
 
 .flags {
@@ -22,7 +23,13 @@ body {
   z-index: 0;
   background: url("https://raw.githubusercontent.com/moT01/FCC-Force-Graph/master/flags.png") no-repeat;
 }
-  
+
+.tooltip-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px
+}
+
 .tooltip-flag {
   position: relative;
   transform: scale(1) !important;
