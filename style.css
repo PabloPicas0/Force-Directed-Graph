@@ -1,10 +1,10 @@
 body {
-  background-color: #000;
+  background-color: #212121;
 }
 
 .tooltip {
   position: fixed;
-  background-color: bisque;
+  background-color: gainsboro;
   padding: 10px;
   border-radius: 10px;
   transition: opacity 250ms ease-out;
